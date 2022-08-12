@@ -1,18 +1,17 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import Web3 from 'web3';
-import './Nav.css';
+import React from "react";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import Web3 from "web3";
+import "./Nav.css";
 
-import { MdSearch, MdAccountCircle } from 'react-icons/md';
+import { MdSearch, MdAccountCircle, MdOutlineAccountBalanceWallet } from 'react-icons/md';
 
 function Nav({ setmainaccount, setmainweb3, setislogin, login }) {
-  console.log(login);
   const [web3, setWeb3] = useState();
-  const [account, setAccount] = useState('');
+  const [account, setAccount] = useState("");
 
   useEffect(() => {
-    if (typeof window.ethereum !== 'undefined') {
+    if (typeof window.ethereum !== "undefined") {
       // window.ethereum이 있다면
       try {
         const web = new Web3(window.ethereum); // 새로운 web3 객체를 만든다
@@ -32,11 +31,28 @@ function Nav({ setmainaccount, setmainweb3, setislogin, login }) {
     setmainweb3(web3);
   }, [web3]);
 
+
   const connectWallet = async () => {
-    const accounts = await window.ethereum.request({
-      method: 'eth_requestAccounts',
-    });
-    setAccount(accounts[0]);
+    try {
+      // try 문 안의 코드가 쭉 실행되고 에러가 없다면 catch는 건너뛴다
+      if (window.ethereum) {
+        // if 👉 메타마스크가 설치되어있으면 실행된다
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts",
+        }); // 연결된 메타마스크의 주소가 나온다
+        // 👉 window.ethereum.request 을 console.log에 찍어보면 확인할수 있다
+
+        setAccount(accounts[0]);
+        //console.log(accounts);
+        // 연결된 메타마스크의 주소를 useState에 담는다
+      } else {
+        // 메타마스크가 설치되어있지 않다면 👉 alert 문구가 나온다
+        alert("Install Metamask!");
+      }
+    } catch (error) {
+      // 에러가 발생한다면 catch 실행
+      console.error(error); // 👉 에러가 발생했다고 출력
+    }
   };
 
   /* const logOut = async () => {
@@ -54,7 +70,7 @@ function Nav({ setmainaccount, setmainweb3, setislogin, login }) {
                 <Link to="/" className="title">
                     <img
                     src="https://storage.googleapis.com/opensea-static/Logomark/OpenSea-Full-Logo%20(dark).png"
-                    height="38"
+                    height="35"
                     />
                 </Link>
                 </h2>
@@ -72,7 +88,7 @@ function Nav({ setmainaccount, setmainweb3, setislogin, login }) {
 
         <div>
           <ul className="menu-item-container">
-          <li>
+            <li>
               <Link to="/explore" className="menu-item">
                 Explore
               </Link>
@@ -84,15 +100,31 @@ function Nav({ setmainaccount, setmainweb3, setislogin, login }) {
             </li>
             <li>
               <Link to="/create" className="menu-item">
-                <div onClick={() => {
+                <div
+                  onClick={() => {
                     connectWallet();
-                  }}>Create
+                  }}
+                >
+                  Create
                 </div>
               </Link>
             </li>
             <li>
-              <Link to="/mypage" className={login ? 'menu-item login' : 'menu-item'}>            
+              <Link
+                to="/mypage"
+                className={login ? "menu-item login" : "menu-item"}
+              >
                 <MdAccountCircle
+                  className="menu-icon"
+                  onClick={() => {
+                    connectWallet();
+                  }}
+                />
+              </Link>
+            </li>
+            <li>
+              <Link to="/mypage" className="menu-item">
+                <MdOutlineAccountBalanceWallet
                   className="menu-icon"
                   onClick={() => {
                     connectWallet();
@@ -114,7 +146,6 @@ function Nav({ setmainaccount, setmainweb3, setislogin, login }) {
               </Link>             
             </li> */}
           </ul>
-
         </div>
       </div>
     </div>
